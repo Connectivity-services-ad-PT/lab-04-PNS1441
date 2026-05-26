@@ -1,0 +1,8 @@
+﻿=== DOCKER IMAGE TAG EVIDENCE ===
+Local tag:  fit4110/access-gate:lab04
+Convention: fit4110/<service>:<lab>
+Team tag:   v0.1.0-team-gate
+
+=== IMAGE DETAILS ===
+IMAGE                       ID             DISK USAGE   CONTENT SIZE   EXTRA
+fit4110/access-gate:lab04   2fd003de2dd7        268MB         63.4MB        

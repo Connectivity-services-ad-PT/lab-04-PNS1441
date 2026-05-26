@@ -1,0 +1,7 @@
+﻿ID: sha256:2fd003de2dd71aa701c39417f69744b091829b515a76ea10cb63a376c346825a
+Created: 2026-05-26T09:25:49.915581296Z
+Size: 63412341
+OS: linux
+Arch: amd64
+User: appuser
+Cmd: [sh -c uvicorn gate_app.main:app --app-dir src --host ${APP_HOST} --port ${APP_PORT}]

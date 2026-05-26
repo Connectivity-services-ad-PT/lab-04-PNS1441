@@ -1,92 +1,104 @@
-# RUN_LOCAL.md – Hướng dẫn chạy Lab 04
+# RUN_LOCAL.md — team-gate (Access Gate Service)
 
-Tài liệu này giúp người khác clone repo sạch và chạy lại service trong Docker.
-
----
-
-## 1. Clone repo
-
-```bash
-git clone <repo-url>
-cd FIT4110_lab04_docker_packaging
-```
+Hướng dẫn chạy lại Access Gate service trong 5 bước.
 
 ---
 
-## 2. Cài dependencies cho Newman/Prism/Spectral
+## Yêu cầu
+
+- Docker Desktop (hoặc Docker Engine)
+- Node.js 20.x LTS + npm
+- Git
+
+---
+
+## Bước 1 — Clone repo và cài dependencies
 
 ```bash
+git clone https://github.com/Connectivity-services-ad-PT/lab-04-PNS1441.git
+cd lab-04-PNS1441
 npm install
 ```
 
 ---
 
-## 3. Build Docker image
+## Bước 2 — Build Docker image
 
 ```bash
-docker build -t fit4110/iot-ingestion:lab04 .
+docker build -t fit4110/access-gate:lab04 .
 ```
 
 ---
 
-## 4. Run container
+## Bước 3 — Chạy container
 
 ```bash
-docker run --rm \
-  --name fit4110-iot-lab04 \
+docker run -d --rm \
+  --name fit4110-gate-lab04 \
   -p 8000:8000 \
   --env-file .env.example \
-  fit4110/iot-ingestion:lab04
+  fit4110/access-gate:lab04
 ```
 
-Mở terminal khác, kiểm tra:
+Kiểm tra health:
 
 ```bash
 curl http://localhost:8000/health
-```
-
-Kết quả mong đợi:
-
-```json
-{
-  "status": "ok",
-  "service": "iot-ingestion",
-  "version": "0.4.0"
-}
+# Expected: {"status":"ok","service":"access-gate","version":"0.4.0"}
 ```
 
 ---
 
-## 5. Chạy Newman test trên container
+## Bước 4 — Chạy Newman test suite
 
 ```bash
 npm run test:local
 ```
 
-Report sinh tại:
+Report được sinh tại:
 
-```text
-reports/newman-lab04-local.xml
-reports/newman-lab04-local.html
+- `reports/newman-lab04-local.xml` (JUnit)
+- `reports/newman-lab04-local.html` (HTML)
+
+---
+
+## Bước 5 — Dừng container
+
+```bash
+docker stop fit4110-gate-lab04
 ```
 
 ---
 
-## 6. Dừng container
-
-Nếu không dùng `--rm` hoặc container còn chạy:
+## Lệnh nhanh bằng Makefile
 
 ```bash
-docker stop fit4110-iot-lab04
+make build        # Build image
+make run          # Run container
+make test-local   # Chạy Newman
+make stop         # Dừng container
+make test-docker  # Build + run + test + stop tự động
 ```
 
 ---
 
-## 7. Lệnh nhanh
+## Thông tin service
+
+| Endpoint | Method | Auth | Mô tả |
+|---|---|---|---|
+| `/health` | GET | Không | Kiểm tra service |
+| `/access-events` | POST | Bearer | Ghi nhận quẹt thẻ |
+| `/access-events` | GET | Bearer | Lấy danh sách events |
+| `/cards/{id}` | GET | Bearer | Lấy thông tin thẻ |
+| `/cards` | POST | Bearer | Tạo thẻ mới |
+
+**Auth token mặc định:** `local-dev-token`  
+**Thẻ test có sẵn:** `CARD-2026-001` (active), `CARD-EXPIRED-001` (expired)
+
+---
+
+## Image tag
 
 ```bash
-make build
-make run
-make test-docker
-make stop
+docker tag fit4110/access-gate:lab04 ghcr.io/<owner>/team-gate:v0.1.0-team-gate
 ```
